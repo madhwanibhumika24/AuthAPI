@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>AuthAPI Dashboard</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Inter", sans-serif; }
+
+    body {
+      min-height: 100vh;
+      background: #f1f5f9;
+      display: flex;
+    }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      width: 240px;
+      background: #fff;
+      border-right: 1px solid #e5e7eb;
+      display: flex;
+      flex-direction: column;
+      padding: 28px 16px;
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 0 8px;
+      margin-bottom: 36px;
+    }
+
+    .brand-icon {
+      width: 32px; height: 32px;
+      background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .brand-icon svg { width: 16px; height: 16px; fill: white; }
+    .brand-name { font-size: 15px; font-weight: 700; color: #111827; }
+
+    .nav-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #9ca3af;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      padding: 0 8px;
+      margin-bottom: 8px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #6b7280;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+      margin-bottom: 2px;
+      text-decoration: none;
+    }
+
+    .nav-item svg { width: 17px; height: 17px; flex-shrink: 0; }
+    .nav-item:hover { background: #f3f4f6; color: #111827; }
+    .nav-item.active { background: #eff6ff; color: #2563eb; font-weight: 600; }
+    .nav-item.active svg { stroke: #2563eb; }
+
+    .sidebar-spacer { flex: 1; }
+
+    .logout-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #ef4444;
+      cursor: pointer;
+      border: none;
+      background: none;
+      width: 100%;
+      transition: background 0.15s;
+    }
+
+    .logout-btn:hover { background: #fef2f2; }
+    .logout-btn svg { width: 17px; height: 17px; }
+
+    /* ── Main ── */
+    .main {
+      margin-left: 240px;
+      flex: 1;
+      padding: 36px 40px;
+      min-height: 100vh;
+    }
+
+    /* Top bar */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 32px;
+    }
+
+    .topbar h1 {
+      font-size: 22px;
+      font-weight: 800;
+      color: #111827;
+      letter-spacing: -0.03em;
+    }
+
+    .topbar p { font-size: 13px; color: #9ca3af; margin-top: 2px; }
+
+    .avatar {
+      width: 38px; height: 38px;
+      background: linear-gradient(135deg, #1d4ed8, #7c3aed);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+      color: white;
+    }
+
+    /* Stats row */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .stat-card {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 16px;
+      padding: 22px 24px;
+    }
+
+    .stat-label {
+      font-size: 12.5px;
+      font-weight: 500;
+      color: #9ca3af;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .stat-label svg { width: 14px; height: 14px; }
+
+    .stat-value {
+      font-size: 26px;
+      font-weight: 800;
+      color: #111827;
+      letter-spacing: -0.03em;
+    }
+
+    .stat-sub { font-size: 12px; color: #6b7280; margin-top: 4px; }
+
+    /* Profile card */
+    .profile-card {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 16px;
+      padding: 28px;
+      margin-bottom: 20px;
+    }
+
+    .profile-card h3 {
+      font-size: 14px;
+      font-weight: 600;
+      color: #111827;
+      margin-bottom: 20px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid #f3f4f6;
+    }
+
+    .profile-row {
+      display: flex;
+      align-items: center;
+      padding: 11px 0;
+      border-bottom: 1px solid #f9fafb;
+      font-size: 14px;
+    }
+
+    .profile-row:last-child { border-bottom: none; }
+
+    .profile-key {
+      width: 120px;
+      font-weight: 500;
+      color: #9ca3af;
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+
+    .profile-val { color: #111827; font-weight: 500; }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      background: #eff6ff;
+      color: #2563eb;
+    }
+
+    /* Loading skeleton */
+    .skeleton {
+      background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.2s infinite;
+      border-radius: 6px;
+      height: 14px;
+    }
+
+    @keyframes shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .main { margin-left: 0; padding: 24px 20px; }
+      .stats { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar">
+  <div class="brand">
+    <div class="brand-icon">
+      <svg viewBox="0 0 24 24"><path d="M12 1C9.24 1 7 3.24 7 6v2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V10a2 2 0 0 0-2-2h-2V6c0-2.76-2.24-5-5-5zm0 2c1.66 0 3 1.34 3 4v2H9V6c0-1.66 1.34-3 3-3zm0 9a2 2 0 1 1 0 4 2 2 0 0 1 0-4z"/></svg>
+    </div>
+    <span class="brand-name">AuthAPI</span>
+  </div>
+
+  <div class="nav-label">Menu</div>
+
+  <a class="nav-item active" href="#">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+    Dashboard
+  </a>
+
+  <a class="nav-item" href="#">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21a8 8 0 0 0-16 0"/><circle cx="12" cy="7" r="4"/></svg>
+    Profile
+  </a>
+
+  <a class="nav-item" href="#">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+    Settings
+  </a>
+
+  <div class="sidebar-spacer"></div>
+
+  <button class="logout-btn" onclick="logoutUser()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+    Logout
+  </button>
+</div>
+
+<!-- Main -->
+<div class="main">
+  <div class="topbar">
+    <div>
+      <h1>Dashboard</h1>
+      <p>Welcome back, <span id="firstName">...</span></p>
+    </div>
+    <div class="avatar" id="avatarInitial">?</div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat-card">
+      <div class="stat-label">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21a8 8 0 0 0-16 0"/><circle cx="12" cy="7" r="4"/></svg>
+        Account Status
+      </div>
+      <div class="stat-value">Active</div>
+      <div class="stat-sub">Verified account</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        Auth Method
+      </div>
+      <div class="stat-value">JWT</div>
+      <div class="stat-sub">Token-based auth</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Session
+      </div>
+      <div class="stat-value" id="sessionTime">--</div>
+      <div class="stat-sub">Current session</div>
+    </div>
+  </div>
+
+  <!-- Profile -->
+  <div class="profile-card">
+    <h3>Account Information</h3>
+    <div id="profileBox">
+      <div class="profile-row"><div class="skeleton" style="width:80%"></div></div>
+      <div class="profile-row"><div class="skeleton" style="width:60%"></div></div>
+      <div class="profile-row"><div class="skeleton" style="width:40%"></div></div>
+    </div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+<script>
+  // Handle Google OAuth redirect token
+  const params = new URLSearchParams(window.location.search);
+  const googleToken = params.get("token");
+  if (googleToken) {
+    localStorage.setItem("token", googleToken);
+    window.history.replaceState({}, document.title, "dashboard.html");
+  }
+
+  // Session timer
+  const start = Date.now();
+  setInterval(() => {
+    const s = Math.floor((Date.now() - start) / 1000);
+    const m = Math.floor(s / 60);
+    document.getElementById("sessionTime").textContent = m > 0 ? `${m}m ${s % 60}s` : `${s}s`;
+  }, 1000);
+
+  async function loadProfile() {
+    const token = localStorage.getItem("token");
+    if (!token) { window.location.href = "login.html"; return; }
+
+    const response = await fetch(`${API_URL}/profile`, {
+      method: "GET",
+      headers: { "Authorization": `Bearer ${token}` }
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      const u = data.user;
+      const first = u.full_name.split(" ")[0];
+
+      document.getElementById("firstName").textContent = first;
+      document.getElementById("avatarInitial").textContent = u.full_name.charAt(0).toUpperCase();
+
+      document.getElementById("profileBox").innerHTML = `
+        <div class="profile-row"><span class="profile-key">Full Name</span><span class="profile-val">${u.full_name}</span></div>
+        <div class="profile-row"><span class="profile-key">Email</span><span class="profile-val">${u.email}</span></div>
+        <div class="profile-row"><span class="profile-key">Role</span><span class="profile-val"><span class="badge">${u.role}</span></span></div>
+      `;
+    } else {
+      localStorage.removeItem("token");
+      window.location.href = "login.html";
+    }
+  }
+
+  function logoutUser() {
+    localStorage.removeItem("token");
+    window.location.href = "login.html";
+  }
+
+  loadProfile();
+</script>
+
+</body>
+</html>
